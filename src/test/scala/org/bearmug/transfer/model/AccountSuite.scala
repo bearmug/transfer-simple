@@ -42,4 +42,15 @@ class AccountSuite extends FunSuite {
     assert(e.getMessage == "requirement failed: insufficient funds, current balance 10, amount to transfer out 100")
   }
 
+  test("account transfer out is OK") {
+    val account = Account.createNew("owner", 10).transferOut(10)
+    assert(account.balance == 0)
+    assert(account.owner == "owner")
+  }
+
+  test("account transfer in is OK") {
+    val account = Account.createNew("owner", 10).transferIn(10)
+    assert(account.balance == 20)
+    assert(account.owner == "owner")
+  }
 }
