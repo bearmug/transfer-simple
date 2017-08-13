@@ -53,4 +53,25 @@ class AccountSuite extends FunSuite {
     assert(account.balance == 20)
     assert(account.owner == "owner")
   }
+
+  test("funds transfer inside account is unavailable") {
+    val e = intercept[IllegalArgumentException] {
+      val account = Account.createNew("owner", 10)
+      Account.transfer(account, account, 1)
+    }
+    assert(e.getMessage == "requirement failed: funds transfer inside account is unavailable")
+  }
+
+  test("funds transfer between two accounts is ok") {
+    val accountFrom = Account.createNew("ownerFrom", 10)
+    val accountTo = Account.createNew("ownerTo", 10)
+    Account.transfer(accountFrom, accountTo, 1) match {
+      case (from, to) =>
+        assert(from.owner == "ownerFrom")
+        assert(from.balance == 9)
+        assert(to.owner == "ownerTo")
+        assert(to.balance == 11)
+      case _ => fail
+    }
+  }
 }
