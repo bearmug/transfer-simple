@@ -27,7 +27,7 @@ trait AccountRepo {
     * @return None if there are no such account or account under maintenance (mutual update) or Some with actual
     *         account content
     */
-  def find(id: Long): Option[Account]
+  def find(id: Int): Option[Account]
 
   /**
     * Updating account by specific identity
@@ -41,5 +41,5 @@ trait AccountRepo {
     * @param id account identity to cleanup to
     * @return None if account under update or account updated recently or Some with purged account content
     */
-  def delete(id: Long): Option[Account]
+  def delete(id: Int): Option[Account]
 }

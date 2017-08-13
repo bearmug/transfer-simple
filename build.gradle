@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     compile 'org.scala-lang:scala-library:2.12.3'
+    compile 'com.typesafe.slick:slick_2.12:3.2.1'
     compile 'io.vertx:vertx-lang-scala_2.12:3.4.2'
     compile 'io.vertx:vertx-web-scala_2.12:3.4.2'
 

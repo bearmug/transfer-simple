@@ -9,7 +9,7 @@ class AccountSuite extends FunSuite {
 
   test("account initiated with zero identity and proper owner/balance") {
     val account = Account.createNew("owner",10)
-    assert(account.id == 0)
+    assert(account.id.isEmpty)
     assert(account.balance == 10)
     assert(account.owner == "owner")
   }
