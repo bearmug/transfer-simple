@@ -1,8 +1,14 @@
 package org.bearmug.transfer.repo
 
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfter, FunSuite}
 
-class AccountRepoMapSuite extends FunSuite {
+class AccountRepoSlickSuite extends FunSuite with BeforeAndAfter {
+
+  var repo: AccountRepo = _
+
+  before {
+    repo = new AccountRepoSlick()
+  }
 
   test("new account listed after creation") {}
   test("account lookup works fine for added account") {}

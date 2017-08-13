@@ -7,30 +7,32 @@ package org.bearmug.transfer.model
   * @param id account identifier
   * @param balance current account balance
   */
-sealed case class Account protected(id: Option[Int], owner: String, balance: Long) {
+sealed case class Account (owner: String, balance: Long, id: Option[Int] = None) {
 
-  def transferIn(amount: Long): Account = {
+  private[model] def transferIn(amount: Long): Account = {
     require(amount >= 0, s"amount to transfer should be >= to zero, its current value: $amount")
-    Account(id, owner, balance + amount)
+    Account(owner, balance + amount, id)
   }
 
-  def transferOut(amount: Long): Account = {
+  private[model] def transferOut(amount: Long): Account = {
     require(amount >= 0, s"amount to transfer should be >= to zero, its current value: $amount")
     require(balance >= amount, s"insufficient funds, current balance $balance, amount to transfer out $amount")
-    Account(id, owner, balance - amount)
+    Account(owner, balance - amount, id)
   }
 }
 
-object EmptyAccount extends Account(None, "", -1)
+object EmptyAccount extends Account("", -1)
 
 /**
-  * Companion object to create pre-validated new account only
+  * Companion object to create pre-validated new account only. Renamed from companion object to prevent clashes with
+  * apply/unapply logic, used from slick repo.
   */
-object Account {
+object AccountFactory {
+
   def createNew(owner: String, initialBalance: Long): Account = {
     require(owner.trim.nonEmpty, "owner name can not be empty")
     require(initialBalance >= 0, s"initial balance $initialBalance can not be less than zero")
-    Account(None, owner, initialBalance)
+    Account(owner, initialBalance)
   }
 
   def transfer(from: Account, to: Account,amount: Long): (Account, Account) = {
