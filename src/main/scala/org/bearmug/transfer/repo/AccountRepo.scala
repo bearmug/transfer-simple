@@ -21,7 +21,7 @@ trait AccountRepo {
     * @return None if account with assigned identity already exists or Some with actually created accounts with
     *         real accounts id
     */
-  def create(account: Account): Future[Option[Account]]
+  def create(account: Account): Future[Option[Int]]
 
   /**
     * Lookup account by account id
@@ -36,20 +36,20 @@ trait AccountRepo {
     * @param account account to update, including identity to find it
     * @return None if account under maintenance (mutual update) or Some with updated account content
     */
-  def update(account: Account): Future[Option[Account]]
+  def update(account: Account): Future[Option[Int]]
 
   /**
     * Purges specific account with specific identity from the repo.
     * @param id account identity to cleanup to
     * @return None if account under update or account updated recently or Some with purged account content
     */
-  def delete(id: Int): Future[Option[Account]]
+  def delete(id: Int): Future[Option[Int]]
 
   /**
     * Accounts money transfer stuff
-    * @param idFrom id to transfer money from
-    * @param idTo id to transfer money to
+    * @param from account to transfer money from
+    * @param to account to transfer money to
     * @param amount amount to transfer
     */
-  def transfer(idFrom: Int, idTo: Int, amount: Long): Future[Option[(Account, Account)]]
+  def transfer(from: Account, to: Account, amount: Long): Future[(Option[Int], Option[Int])]
 }
