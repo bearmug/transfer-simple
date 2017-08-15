@@ -96,4 +96,9 @@ class AccountRepoSlickSuite extends FunSuite with BeforeAndAfter with ScalaFutur
       case Some(_) => fail()
     }
   }
+
+  test("funds transfer works fine for positive scenario") {fail()}
+  test("funds transfer failed for insufficient funds") {fail()}
+  test("funds transfer failed for concurrently updated source") {fail()}
+  test("funds transfer failed for concurrently updated recipient") {fail()}
 }
