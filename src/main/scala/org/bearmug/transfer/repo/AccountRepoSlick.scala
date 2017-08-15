@@ -23,10 +23,10 @@ class AccountRepoSlick extends AccountRepo with AccountTable with H2Config {
     db.run(accounts.filter(_.id === id).result.headOption)
 
   override def update(account: Account): Future[Option[Int]] =
-    db.run(accounts.filter(_.id === account.id).update(account)).map(Some(_))
+    db.run(accounts.filter(_.id === account.id).update(account)).map(res => if (res > 0) account.id else None)
 
   override def delete(id: Int): Future[Option[Int]] =
-    db.run(accounts.filter(_.id === id).delete).map(Some(_))
+    db.run(accounts.filter(_.id === id).delete).map(res => if (res > 0) Some(id) else None)
 
   def transfer(from: Account, to: Account, amount: Long): Future[(Option[Int], Option[Int])] = {
     val (updatedFromAcc, updatedToAcc) = AccountFactory.transfer(from, to, amount)
