@@ -97,8 +97,60 @@ class AccountRepoSlickSuite extends FunSuite with BeforeAndAfter with ScalaFutur
     }
   }
 
-  test("funds transfer works fine for positive scenario") {fail()}
-  test("funds transfer failed for insufficient funds") {fail()}
-  test("funds transfer failed for concurrently updated source") {fail()}
-  test("funds transfer failed for concurrently updated recipient") {fail()}
+  test("funds transfer works fine for positive scenario") {
+    for {
+      fromId <- repo.create(AccountFactory.createNew("f", 10))
+      toId <- repo.create(AccountFactory.createNew("t", 10))
+      fromAcc <- repo.find(fromId.get)
+      toAcc <- repo.find(toId.get)
+      (idFrom, idTo) <- repo.transfer(fromAcc.get, toAcc.get, 5)
+      fromUpdated <- repo.find(idFrom.get)
+      toUpdated <- repo.find(idTo.get)
+    } yield (fromUpdated, toUpdated) match {
+      case (Some(f), Some(t)) =>
+        assert(f.balance == 5)
+        assert(t.balance == 15)
+      case _ => fail()
+    }
+  }
+  test("funds transfer failed for insufficient funds") {
+    for {
+      fromId <- repo.create(AccountFactory.createNew("f", 10))
+      toId <- repo.create(AccountFactory.createNew("t", 10))
+      fromAcc <- repo.find(fromId.get)
+      toAcc <- repo.find(toId.get)
+      (idFrom, idTo) <- repo.transfer(fromAcc.get, toAcc.get, 50)
+    } yield (idFrom, idTo) match {
+      case (None, None) =>
+      case _ => fail()
+    }
+  }
+
+  test("funds transfer failed for concurrently updated source") {
+    for {
+      fromId <- repo.create(AccountFactory.createNew("f", 10))
+      toId <- repo.create(AccountFactory.createNew("t", 10))
+      fromAcc <- repo.find(fromId.get)
+      toAcc <- repo.find(toId.get)
+      updated <- repo.update(fromAcc.get.copy(balance = 1000))
+      (idFrom, idTo) <- repo.transfer(fromAcc.get, toAcc.get, 1)
+    } yield (idFrom, idTo) match {
+      case (None, None) =>
+      case _ => fail()
+    }
+  }
+
+  test("funds transfer failed for concurrently updated recipient") {
+    for {
+      fromId <- repo.create(AccountFactory.createNew("f", 10))
+      toId <- repo.create(AccountFactory.createNew("t", 10))
+      fromAcc <- repo.find(fromId.get)
+      toAcc <- repo.find(toId.get)
+      updated <- repo.update(toAcc.get.copy(balance = 1000))
+      (idFrom, idTo) <- repo.transfer(fromAcc.get, toAcc.get, 1)
+    } yield (idFrom, idTo) match {
+      case (None, None) =>
+      case _ => fail()
+    }
+  }
 }
