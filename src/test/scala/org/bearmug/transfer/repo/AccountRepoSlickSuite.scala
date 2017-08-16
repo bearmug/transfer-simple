@@ -1,6 +1,7 @@
 package org.bearmug.transfer.repo
 
-import org.bearmug.transfer.model.AccountFactory
+import org.bearmug.transfer.model.{Account, AccountFactory}
+import org.bearmug.transfer.tool.FutureO
 import org.junit.runner.RunWith
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.junit.JUnitRunner
@@ -32,21 +33,19 @@ class AccountRepoSlickSuite extends FunSuite with BeforeAndAfter with ScalaFutur
   }
 
   test("account lookup works fine for added account") {
-    val account = AccountFactory.createNew("mine", 10)
-    whenReady(repo.create(account)) {
-      case None => fail()
-      case Some(acc) => whenReady(repo.find(acc)) {
-        case None => fail()
-        case Some(found) =>
-          assert(found.id.head == acc)
-          assert(found.balance == 10)
-          assert(found.owner == "mine")
-      }
+    for {
+      id <- FutureO(repo.create(AccountFactory.createNew("mine", 10)))
+      found <- FutureO(repo.find(id))
+    } yield found match {
+      case (acc: Account) =>
+        assert(acc == AccountFactory.createNew("mine", 10).copy(id = Some(id)))
+      case _ => fail()
     }
   }
 
+  private val NonExistingId = 99999
   test("account lookup does not work for non-existent account") {
-    whenReady(repo.find(99999)) {
+    whenReady(repo.find(NonExistingId)) {
       case Some(_) => fail()
       case None =>
     }
@@ -69,8 +68,8 @@ class AccountRepoSlickSuite extends FunSuite with BeforeAndAfter with ScalaFutur
   }
 
   test("non-existing account can not be removed") {
-    whenReady(repo.delete(99999)) {
-      case Some(id) =>
+    whenReady(repo.delete(NonExistingId)) {
+      case Some(_) =>
         fail()
       case None =>
     }
