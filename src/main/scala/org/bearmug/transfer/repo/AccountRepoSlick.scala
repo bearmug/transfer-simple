@@ -11,7 +11,7 @@ class AccountRepoSlick extends AccountRepo with AccountTable with H2Config {
 
   import driver.api._
 
-  def createDb: Future[Unit] = db.run(DBIO.seq(accounts.schema.create))
+  def createDb: Future[Unit] = db.run(DBIO.seq(accounts.schema.create).transactionally)
 
   override def list(): Future[List[Account]] =
     db.run(accounts.result).map(_.toList)

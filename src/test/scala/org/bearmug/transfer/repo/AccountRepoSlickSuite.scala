@@ -5,25 +5,25 @@ import org.bearmug.transfer.tool.FutureO
 import org.junit.runner.RunWith
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class AccountRepoSlickSuite extends FunSuite with BeforeAndAfter with ScalaFutures {
+class AccountRepoSlickSuite extends FunSuite with BeforeAndAfterAll with ScalaFutures {
 
   var repo: AccountRepoSlick = _
 
-  before {
+  override def beforeAll() {
     repo = new AccountRepoSlick()
-    Await.ready(repo.createDb, 10 seconds)
+    Await.ready(repo.createDb, Duration.Inf)
     println("test database created")
   }
 
   test("new account listed after creation") {
-    val account = AccountFactory.createNew("mine", 10)
+    val account = AccountFactory.createNew("mine", 11)
     val createdAccount = repo.create(account)
     whenReady(createdAccount) {
       case None => fail()
