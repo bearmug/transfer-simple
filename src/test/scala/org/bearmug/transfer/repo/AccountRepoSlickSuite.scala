@@ -28,7 +28,10 @@ class AccountRepoSlickSuite extends FunSuite with BeforeAndAfterAll with ScalaFu
     whenReady(createdAccount) {
       case None => fail()
       case Some(acc) =>
-        assert(acc > 0)
+        whenReady(repo.find(acc)) {
+          case None => fail()
+          case Some(_) =>
+        }
     }
   }
 
